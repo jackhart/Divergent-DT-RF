@@ -42,10 +42,10 @@ def create_synthetic_data(seed=55, n=1000, type='xor'):
     """
     np.random.seed(seed)
     if type == 'xor':
-        X = np.random.uniform(low=-2, high=2, size=(n,)).reshape(-1, 1)
+        x = np.random.uniform(low=-2, high=2, size=(n,))
         y = np.random.uniform(low=-2, high=2, size=(n,))
 
-        y = ( (X[:,0] < 0) & (y < 0) | (X[:,0] > 0) & (y > 0)).astype(int)
-        return X, y
+        c = ((x < 0) & (y < 0) | (x > 0) & (y > 0)).astype(int)
+        return np.concatenate([x.reshape(-1, 1),y.reshape(-1, 1)], axis=1), c.reshape(-1, 1)
 
     raise NotImplementedError
