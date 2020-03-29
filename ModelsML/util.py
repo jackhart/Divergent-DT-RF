@@ -29,23 +29,27 @@ def load_UCI(data_file):
     :return: X, y
     """
     # TODO: create loading function for UCI datasets
-
     raise NotImplementedError
 
-
-def create_synthetic_data(seed=55, n=1000, type='xor'):
+def create_synthetic_data_function(seed_p=58, n_p=1000, type_p='xor'):
     """
-    create specified random dataset
-    :param seed: int, random seed for numpy
-    :param type: str, the dataset you want returned
-    :return: X, y  tuple( np.array(n,p), np.array(n,) ), synthetic data
+    create dataset function for synthetic data
+    :param seed_p: int, random seed for numpy
+    :param type_p: str, the dataset you want returned
+    :return: function, function for creating dataset
     """
-    np.random.seed(seed)
-    if type == 'xor':
-        x = np.random.uniform(low=-2, high=2, size=(n,))
-        y = np.random.uniform(low=-2, high=2, size=(n,))
+    def create_synthetic_data(seed=seed_p, n=n_p, type=type_p):
+        """ create specified random dataset
+        :return: (X, y, data_types)  tuple( np.array(n,p), np.array(n,), list ), synthetic data
+        """
+        np.random.seed(seed)
+        if type == 'xor':
+            x = np.random.uniform(low=-2, high=2, size=(n,))
+            y = np.random.uniform(low=-2, high=2, size=(n,))
 
-        c = ((x < 0) & (y < 0) | (x > 0) & (y > 0)).astype(int)
-        return np.concatenate([x.reshape(-1, 1),y.reshape(-1, 1)], axis=1), c.reshape(-1, 1)
+            c = ((x < 0) & (y < 0) | (x > 0) & (y > 0)).astype(int)
+            return np.concatenate([x.reshape(-1, 1), y.reshape(-1, 1)], axis=1), c.reshape(-1, 1), ['n', 'n']
 
-    raise NotImplementedError
+        raise NotImplementedError
+
+    return create_synthetic_data
