@@ -21,7 +21,13 @@ def main(data_file):
     basic_tree_fitted = basic_tree.train(X_train, y_train, data_types=['n', 'n'])
 
     # holdout example
-    probabilities, predictions = basic_tree_fitted.predict(X_test, y_test)
+    print(X_train.shape)
+    probabilities, predictions = basic_tree_fitted.predict(X_test)
+
+    # Debugging
+    # print(probabilities[0:10])
+    # print(predictions[0:10])
+    # print(y_test[0:10])
 
     # print results
     print(f"Accuracy: {accuracy_score(y_test, predictions)}")

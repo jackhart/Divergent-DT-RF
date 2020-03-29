@@ -43,7 +43,7 @@ class GeneralDecisionTree(object):
         if self.children is None:
             return self
         try:
-            child_index = self.split_rule(x[self.split_feature])[0]
+            child_index = self.split_rule(x[self.split_feature])
         except TypeError:
             return self  # edge case if test data contains NA
 
@@ -89,7 +89,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
         for idx, data_type in zip(range(X.shape[1]), data_types):
             x = X[:, idx]
 
-            new_thr, new_gini = self._best_split_classification(x, y, data_type, classes)
+            new_thr, new_gini, left_distribution, right_distribution = self._best_split_classification(x, y, data_type, classes)
 
             if new_gini < best_gini:  # minimize gini
                 best_gini, best_thr, best_p_ind, best_type = new_gini, new_thr, idx, data_type
@@ -107,29 +107,28 @@ class DecisionTreeClassification(GeneralDecisionTree):
             # calculate class distributions for children
             splits = self.split_rule(X[:, best_p_ind])
 
-            right_y = y[splits == 1]
-            left_y = y[splits == 0]
+            # subset data for splits
+            right_y, right_x = y[splits == 1],  X[splits == 1, :]
+            left_y, left_x = y[splits == 0], X[splits == 0, :]
 
             if (right_y.size < min_size) or (left_y.size < min_size):
                 # stopping criterion: if either child is less than min size, don't split
                 self.split_rule = None
+                self.split_feature = None
                 return
-
-            _, right_distribution = np.unique(right_y, return_counts=True)
-            _, left_distribution = np.unique(left_y, return_counts=True)
 
             # grow left child
             left_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child1",
                                                    class_counts=np.array(left_distribution), n_subset=left_y.size)
 
-            left_tree.grow_tree(X[splits == 0, :], left_y, data_types, gini(np.array(left_distribution), left_y.size),
+            left_tree.grow_tree(left_x, left_y, data_types, gini(np.array(left_distribution), left_y.size),
                                 classes=classes, min_size=min_size, max_depth=max_depth, current_depth=current_depth + 1)
 
             # grow right child
             right_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child2",
                                                     class_counts=np.array(right_distribution), n_subset=right_y.size)
 
-            right_tree.grow_tree(X[splits == 1, :], right_y, data_types, gini(np.array(right_distribution), right_y.size),
+            right_tree.grow_tree(right_x, right_y, data_types, gini(np.array(right_distribution), right_y.size),
                                  classes=classes, min_size=min_size, max_depth=max_depth, current_depth=current_depth + 1)
 
             # add children to tree
@@ -142,7 +141,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
     @staticmethod
     def _best_split_classification(feature_values, labels, data_type, classes):
-        impurity = []
+        best_thr, impurity, best_left_dist, best_right_dist = None, 1, None, None   # current min impurity
         possible_thresholds = np.unique(feature_values)
 
         num_labels = labels.size
@@ -155,7 +154,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
             if data_type == 'c':
                 selection = np.isin(feature_values, threshold)
             else:
-                selection = feature_values >= threshold
+                selection = feature_values > threshold
 
             right = labels[selection]
             left = labels[~selection]
@@ -180,7 +179,8 @@ class DecisionTreeClassification(GeneralDecisionTree):
             # compute weighted total impurity of the split
             gini_split = (num_right * gini_right + (num_labels - num_right) * gini_left) / num_labels
 
-            impurity.append(gini_split)
+            if gini_split < impurity:
+                best_thr, impurity, best_left_dist, best_right_dist = threshold, gini_split, left_distribution, right_distribution
 
             # Debug
             # print(f"right dist: {right_distribution}")
@@ -193,7 +193,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
         # print(f"min gini: {np.min(impurity)}")
 
         # returns the threshold with the min associated impurity value --> best split threshold
-        return possible_thresholds[np.argmin(impurity)], np.amin(impurity)
+        return best_thr, impurity, best_left_dist, best_right_dist
 
     def __repr__(self):
         return f"DecisionTreeClassification(name='{self.name}', children={[child for child in self.children]})"
