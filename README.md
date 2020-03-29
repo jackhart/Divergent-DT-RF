@@ -30,3 +30,19 @@ $ python setup.py develop
 ## Dataset
 
 Working with data from [UCI Machine Learning Repo](https://archive.ics.uci.edu/ml/datasets.php)
+
+## Command Line Examples
+
+Example usage of `experiment_script.py`
+
+This is the default:
+
+``` bash
+$ python experiment_script.py --experiment_hparams classic_xor
+```
+
+Here's an example of using a specific Hparam object:
+
+``` bash
+$ python experiment_script.py --experiment_hparams classic_donut
+```

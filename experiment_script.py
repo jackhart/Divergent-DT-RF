@@ -23,6 +23,10 @@ def main(args):
     # extract hparams for experiment
     hparams = ParamsContainers.experiment_params[args.experiment_hparams]
 
+    # update hparams
+    if args.hparams_update is not None:
+        hparams.update_attributes(args.hparams_update)
+
     # create dataset
     dataset_x, dataset_y, data_types = datasets[hparams.dataset](seed=hparams.seed, n=500)
 
@@ -51,6 +55,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--experiment_hparams', type=str, default='classic_xor',
                         help='ParamContainer for experiment hyper-parameters')
+    """See defined_params.py for Hparam objects"""
 
     parser.add_argument('--hparams_update', type=str, default=None,
                         help='Comma separated key-value pairs to update Hparams object')

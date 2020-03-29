@@ -3,7 +3,7 @@
 import numpy as np
 import math
 from itertools import combinations
-
+from sklearn.datasets import make_gaussian_quantiles
 
 def gini(class_counts, total_count):
     if total_count == 0:
@@ -49,6 +49,13 @@ def create_synthetic_data_function(seed_p=58, n_p=1000, type_p='xor'):
 
             c = ((x < 0) & (y < 0) | (x > 0) & (y > 0)).astype(int)
             return np.concatenate([x.reshape(-1, 1), y.reshape(-1, 1)], axis=1), c.reshape(-1, 1), ['n', 'n']
+
+        # Construct dataset
+        if type == 'donut':
+            X1, y1 = make_gaussian_quantiles(cov=3.,
+                                             n_samples=n, n_features=2,
+                                             n_classes=2, random_state=seed)
+            return np.array(X1), np.array(y1).reshape(-1, 1), ['n', 'n']
 
         raise NotImplementedError
 
