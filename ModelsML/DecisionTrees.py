@@ -39,6 +39,7 @@ class GeneralDecisionTree(object):
             self._children.remove(child)
 
     def traverse(self, x):
+        """Method for traversing tree given some example from data.  Recursive."""
 
         if self.children is None:
             return self
@@ -66,6 +67,18 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
     def __init__(self, class_counts, n_subset, name='root',
                  children=None, split_rule=None, split_feature=None):
+        """
+        Initialize decision tree with functionality specific for traditional classification.
+
+        :param class_counts, np.array, counts of examples for each class in node
+        :param n_subset, int, number of examples represented by this node
+
+        :param name, str, (default='root'), see parent class
+        :param children, list, (default=None), see parent class
+        :param split_rule, lambda function, (default=None), function that returns index of child for split
+        :param split_feature, int, (default=None), index of feature to split on in dataset for current node
+        """
+
         super().__init__(name=name, children=children,
                          split_rule=split_rule, split_feature=split_feature)
 
@@ -74,6 +87,20 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
     def grow_tree(self, X, y, data_types, best_gini, classes,
                   min_size=2, max_depth=None, current_depth=0, max_gini=1):
+        """
+        Grows tree for given dataset for a classification task.  Recursive.
+
+        :param X, np.array, subset of variables to split on
+        :param y, np.array, subset of classes
+        :param data_types, list, data types (i.e. numeric, ordinal, or categorical) of X
+        :param best_gini, double, gini of the current node being split
+        :param classes, np.array, array of all possible class values
+
+        :param min_size, int, (default=2) minimum allowable number of examples making up a node
+        :param max_depth, int, (default=None) maximum number of branches off nodes allowed
+        :param current_depth, used in recursion to keep track of tree depth
+        :param max_gini, int, (default=1) maximum gini you allow for a split to happen
+        """
 
         if (y.size < min_size) or (best_gini == 0.0):
             # stopping criterion: node be smaller than min size
@@ -81,7 +108,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
             return
         if max_depth is not None:
             if current_depth > max_depth:
-                # node be smaller than min size
+                # stopping criterion: cannot build tree greater than max size
                 return
 
         best_thr, best_p_ind, best_type = None, None, None
@@ -139,8 +166,26 @@ class DecisionTreeClassification(GeneralDecisionTree):
             # gini is greater than user-specified maximum gini
             return
 
+    def prune(self):
+        # TODO: Implement pruning method
+        raise NotImplementedError
+
     @staticmethod
     def _best_split_classification(feature_values, labels, data_type, classes):
+        """
+         Determines the best split possible for a given feature.
+         Helper method for grow_tree()
+
+         :param feature_values, np.array, subset of variables for given feature to split on
+         :param labels, np.array, subset of classes
+         :param data_type, str, data type (i.e. numeric, ordinal, or categorical) for given feature
+         :param classes, np.array, array of all possible class values
+
+         :returns tuple, (best_thr, impurity, best_left_dist, best_right_dist)
+                  Returns best value to split on and associated impurity,
+                  along with the class distributions in each node.
+         """
+
         best_thr, impurity, best_left_dist, best_right_dist = None, 1, None, None   # current min impurity
         possible_thresholds = np.unique(feature_values)
 
@@ -182,16 +227,6 @@ class DecisionTreeClassification(GeneralDecisionTree):
             if gini_split < impurity:
                 best_thr, impurity, best_left_dist, best_right_dist = threshold, gini_split, left_distribution, right_distribution
 
-            # Debug
-            # print(f"right dist: {right_distribution}")
-            # print(f"left dist: {left_distribution}")
-            # print(f"right gini: {gini_right}")
-            # print(f"left gini: {gini_left}")
-            # print(f"gini split: {gini_split}")
-
-        # Debug - Minimum gini
-        # print(f"min gini: {np.min(impurity)}")
-
         # returns the threshold with the min associated impurity value --> best split threshold
         return best_thr, impurity, best_left_dist, best_right_dist
 
@@ -200,3 +235,5 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
     def __str__(self):
         return self.__repr__()
+
+
