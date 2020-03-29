@@ -63,23 +63,21 @@ class ClassicDecisionTreeClassifier(Estimator):
 
         return self
 
-    def predict(self, x_test, y_test, *args):
+    def predict(self, x_test):
         """
         Uses averaging in the leaf nodes for classification.
 
         Default setup for predicting with trained estimator
         :param x_test: np.array(shape=(m, p)), testing features
-        :param y_test: np.array(shape=(m, )),  testing classes/values
 
         :return tuple of lists: (probabilities, predictions)
         """
 
         m, p = x_test.shape
-        assert m == y_test.size, "y_test and x_test are not the same length"
 
         probabilities = []
         predictions = []
-        for x in zip(x_test, y_test):
+        for x in x_test:
             final_node = self.tree.traverse(x)
 
             probabilities.append(final_node.class_counts / final_node.n_subset)
