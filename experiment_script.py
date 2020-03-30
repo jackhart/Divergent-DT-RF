@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from ModelsML.DecisionTreeEstimators import ClassicDecisionTreeClassifier
-from ModelsML.util import create_synthetic_data_function
+from ModelsML.util import create_synthetic_data_function, load_UCI_function
 from ModelsML.defined_params import *
 
 import argparse
@@ -13,7 +13,9 @@ classifiers = {'ClassicDecisionTreeClassifier': ClassicDecisionTreeClassifier}
 
 datasets = {'xor': create_synthetic_data_function(type_p='xor'),
             'donut': create_synthetic_data_function(type_p='donut'),
-            'iris': create_synthetic_data_function(type_p='iris')}
+            'iris': create_synthetic_data_function(type_p='iris'),
+            'wine': create_synthetic_data_function(type_p='wine'),
+            'votes': load_UCI_function(type_p='votes')}
 
 split_types = ['holdout']  # TODO: Add implementation beyond holdout
 
@@ -29,7 +31,7 @@ def main(args):
         hparams.update_attributes(args.hparams_update)
 
     # create dataset
-    dataset_x, dataset_y, data_types = datasets[hparams.dataset](seed=hparams.seed, n=500)
+    dataset_x, dataset_y, data_types = datasets[hparams.dataset](hparams)
 
     # instantiate estimator
     basic_tree = classifiers[hparams.model]()
@@ -60,9 +62,6 @@ if __name__ == '__main__':
 
     parser.add_argument('--hparams_update', type=str, default=None,
                         help='Comma separated key-value pairs to update Hparams object')
-
-    parser.add_argument('--uci_data', type=str, default="ICI/data/breast-cancer-wisconsin.data",
-                        help='path to dataset')
 
     args = parser.parse_args()
     main(args)
