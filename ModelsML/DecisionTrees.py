@@ -65,6 +65,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
     Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression Tree
     ftp://ftp.boulder.ibm.com/software/analytics/spss/support/Stats/Docs/Statistics/Algorithms/14.0/TREE-CART.pdf
     """
+    # TODO: Does not yet handle missing data exactly like algorithm described by Breiman
 
     def __init__(self, class_counts, n_subset, name='root',
                  children=None, split_rule=None, split_feature=None):
@@ -170,6 +171,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
     def prune(self):
         # TODO: Implement pruning method
+        # Unclear on how the CART algorithm post-prunes compared to C4.5
         raise NotImplementedError
 
     @staticmethod
@@ -240,3 +242,56 @@ class DecisionTreeClassification(GeneralDecisionTree):
         return self.__repr__()
 
 
+class KeDTClassification(DecisionTreeClassification):
+    """
+     Decision Tree implemented to support Kernel Decision Trees.  These trees will support KERF models discussed here:
+
+        Olson, Matthew and Abraham J. Wyner. “Making Sense of Random Forest Probabilities: a Kernel Perspective”.
+        ArXiv https://arxiv.org/abs/1812.05792
+
+        Scornet, E. “Random Forests and Kernel Methods”.
+        ArXiv https://arxiv.org/abs/1502.03836
+
+    This decision tree follows the same algorithm as DecisionTreeClassification; however, the classification method
+    is tweaked to support theoretical kernel interpretations of probabilities.
+    """
+
+    def __init__(self, name='root',
+                 children=None, split_rule=None, split_feature=None):
+        """
+        Initialize decision tree with functionality specific for traditional classification.
+
+        :param name, str, (default='root'), see parent class
+        :param children, list, (default=None), see parent class
+        :param split_rule, lambda function, (default=None), function that returns index of child for split
+        :param split_feature, int, (default=None), index of feature to split on in dataset for current node
+        """
+        super(GeneralDecisionTree).__init__(name=name, children=children,
+                                            split_rule=split_rule, split_feature=split_feature)
+        # TODO: Implement init
+
+    # overload grow tree method
+    def grow_tree(self, X, y, data_types, best_gini, classes,
+                  min_size=2, max_depth=None, current_depth=0, max_gini=1):
+        """
+        Grows tree for given dataset for a classification task.  Recursive.
+
+        :param X, np.array, subset of variables to split on
+        :param y, np.array, subset of classes
+        :param data_types, list, data types (i.e. numeric, ordinal, or categorical) of X
+        :param best_gini, double, gini of the current node being split
+        :param classes, np.array, array of all possible class values
+
+        :param min_size, int, (default=2) minimum allowable number of examples making up a node
+        :param max_depth, int, (default=None) maximum number of branches off nodes allowed
+        :param current_depth, used in recursion to keep track of tree depth
+        :param max_gini, int, (default=1) maximum gini you allow for a split to happen
+        """
+        # TODO: Implement grow_tree
+        raise NotImplementedError
+
+    def __repr__(self):
+        return f"KeRFClassification(name='{self.name}', children={[child for child in self.children]})"
+
+    def __str__(self):
+        return self.__repr__()

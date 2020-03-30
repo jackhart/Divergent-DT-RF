@@ -16,12 +16,11 @@ class ClassicDecisionTreeClassifier(Estimator):
 
     def __init__(self, data_types=None):
         """
-        Default implementation
+        Initialize estimator with default values.
         :param data_types: list, optional, ordered list of feature types (see base Estimator class for details)
-        :param kwargs: keyword arguments
         """
+        super().__init__()
         self.data_types = data_types
-
         self.tree = None
         self.simplified_tree = None   # TODO: make tree struct with simpler storage to improve classification time?
         self.n_classes = None
@@ -29,7 +28,8 @@ class ClassicDecisionTreeClassifier(Estimator):
     @time_function
     def train(self, x_train, y_train, data_types=None, min_size=2, max_depth=None, max_gini=1):
         """
-        Default setup for training estimator
+        Train classic decision tree.
+
         :param x_train: np.array(shape=(n, p)),  training features
         :param y_train: np.array(shape=(n, 1)),   training classes/values
         :param data_types: list, optional,  ordered list of feature types (see base Estimator class for details)
@@ -69,9 +69,7 @@ class ClassicDecisionTreeClassifier(Estimator):
         """
         Uses averaging in the leaf nodes for classification.
 
-        Default setup for predicting with trained estimator
         :param x_test: np.array(shape=(m, p)), testing features
-
         :return tuple of lists: (probabilities, predictions)
         """
 
