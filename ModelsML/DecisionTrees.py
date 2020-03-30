@@ -48,6 +48,7 @@ class GeneralDecisionTree(object):
         except TypeError:
             return self  # edge case if test data contains NA
 
+        child_index = np.asscalar(np.array(child_index))
         return self.children[child_index].traverse(x)
 
     def __repr__(self):
