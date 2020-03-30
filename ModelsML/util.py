@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import math
+import timeit
 from itertools import combinations
 from sklearn.datasets import make_gaussian_quantiles, load_iris, load_wine
 
@@ -80,3 +81,16 @@ def load_UCI_function(type_p='votes'):
         raise NotImplementedError
 
     return load_UCI
+
+
+def time_function(func):
+    """decorator function to add computation time to function output"""
+    def wrapper(*args, **kwargs):
+        start = timeit.default_timer()
+        values = func(*args, **kwargs)
+        if isinstance(values, tuple):
+            return (*values, timeit.default_timer() - start)
+        else:
+            return values, timeit.default_timer() - start
+
+    return wrapper

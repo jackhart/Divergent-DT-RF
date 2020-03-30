@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from ModelsML.DecisionTreeEstimators import ClassicDecisionTreeClassifier
-from ModelsML.util import create_synthetic_data_function, load_UCI_function
+from ModelsML.util import create_synthetic_data_function, load_UCI_function, time_function
 from ModelsML.defined_params import *
 
 import argparse
@@ -42,16 +42,19 @@ def main(args):
                                                         test_size=hparams.prop_test, random_state=hparams.seed)
 
     # train estimator
-    basic_tree_fitted = basic_tree.train(x_train, y_train, data_types=data_types)
+    basic_tree_fitted, train_time = basic_tree.train(x_train, y_train, data_types=data_types)
 
     # predict
-    probabilities_train, predictions_train = basic_tree_fitted.predict(x_train)
-    probabilities_test, predictions_test = basic_tree_fitted.predict(x_test)
+    probabilities_train, predictions_train, train_pred_time = basic_tree_fitted.predict(x_train)
+    probabilities_test, predictions_test, test_pred_time = basic_tree_fitted.predict(x_test)
+
 
     # print results
     print(f"Train Accuracy: {accuracy_score(y_train, predictions_train)}")
     print(f"Test Accuracy: {accuracy_score(y_test, predictions_test)}")
-
+    print(f"Train Time: {train_time}")
+    print(f"Train Prediction Time: {train_pred_time}")
+    print(f"Test Prediction Time: {test_pred_time}")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='experiment runner')

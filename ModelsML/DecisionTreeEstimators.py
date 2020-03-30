@@ -2,7 +2,7 @@
 
 from .abstract_estimator import Estimator
 from .DecisionTrees import DecisionTreeClassification
-from .util import gini
+from .util import gini, time_function
 import numpy as np
 
 class ClassicDecisionTreeClassifier(Estimator):
@@ -26,6 +26,7 @@ class ClassicDecisionTreeClassifier(Estimator):
         self.simplified_tree = None   # TODO: make tree struct with simpler storage to improve classification time?
         self.n_classes = None
 
+    @time_function
     def train(self, x_train, y_train, data_types=None, min_size=2, max_depth=None, max_gini=1):
         """
         Default setup for training estimator
@@ -63,6 +64,7 @@ class ClassicDecisionTreeClassifier(Estimator):
 
         return self
 
+    @time_function
     def predict(self, x_test):
         """
         Uses averaging in the leaf nodes for classification.
@@ -83,7 +85,7 @@ class ClassicDecisionTreeClassifier(Estimator):
             probabilities.append(final_node.class_counts / final_node.n_subset)
             predictions.append(self.n_classes[np.argmax(probabilities[-1])])
 
-        return probabilities, predictions
+        return (probabilities, predictions)
 
     def __repr__(self):
         return 'ClassicDecisionTree()'
