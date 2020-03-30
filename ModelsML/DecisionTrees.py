@@ -212,7 +212,8 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
             # assure class distributions are in the correct order and the correct shape
             new_right, new_left = np.zeros(classes.shape), np.zeros(classes.shape)
-            inx_right, inx_left = np.where(unique_right == classes), np.where(unique_left == classes)
+            inx_right = np.isin(classes, unique_right, assume_unique=True)
+            inx_left = np.isin(classes, unique_left, assume_unique=True)
             new_right[inx_right], new_left[inx_left] = right_distribution, left_distribution
 
             right_distribution, left_distribution = new_right, new_left

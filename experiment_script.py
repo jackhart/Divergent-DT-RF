@@ -12,7 +12,8 @@ from sklearn.metrics import accuracy_score
 classifiers = {'ClassicDecisionTreeClassifier': ClassicDecisionTreeClassifier}
 
 datasets = {'xor': create_synthetic_data_function(type_p='xor'),
-            'donut': create_synthetic_data_function(type_p='donut')}
+            'donut': create_synthetic_data_function(type_p='donut'),
+            'iris': create_synthetic_data_function(type_p='iris')}
 
 split_types = ['holdout']  # TODO: Add implementation beyond holdout
 

@@ -3,7 +3,8 @@
 import numpy as np
 import math
 from itertools import combinations
-from sklearn.datasets import make_gaussian_quantiles
+from sklearn.datasets import make_gaussian_quantiles, load_iris
+
 
 def gini(class_counts, total_count):
     if total_count == 0:
@@ -20,16 +21,6 @@ def find_splits(x):
             values.append(temp)
 
     return values
-
-
-def load_UCI(data_file):
-    """
-    Load a tsv of movie reviews, where field 0 is review id and field -1 is review
-    :param data_file: data file path
-    :return: X, y
-    """
-    # TODO: create loading function for UCI datasets
-    raise NotImplementedError
 
 def create_synthetic_data_function(seed_p=58, n_p=1000, type_p='xor'):
     """
@@ -50,13 +41,25 @@ def create_synthetic_data_function(seed_p=58, n_p=1000, type_p='xor'):
             c = ((x < 0) & (y < 0) | (x > 0) & (y > 0)).astype(int)
             return np.concatenate([x.reshape(-1, 1), y.reshape(-1, 1)], axis=1), c.reshape(-1, 1), ['n', 'n']
 
-        # Construct dataset
         if type == 'donut':
-            X1, y1 = make_gaussian_quantiles(cov=3.,
+            x, y = make_gaussian_quantiles(cov=3.,
                                              n_samples=n, n_features=2,
                                              n_classes=2, random_state=seed)
-            return np.array(X1), np.array(y1).reshape(-1, 1), ['n', 'n']
+            return np.array(x), np.array(y).reshape(-1, 1), ['n', 'n']
 
+        if type == 'iris':
+            x, y = load_iris(return_X_y=True)
+            return np.array(x), np.array(y).reshape(-1, 1), ['n']*4
         raise NotImplementedError
 
     return create_synthetic_data
+
+
+def load_UCI(data_file):
+    """
+    Load a tsv of movie reviews, where field 0 is review id and field -1 is review
+    :param data_file: data file path
+    :return: X, y
+    """
+    # TODO: create loading function for UCI datasets
+    raise NotImplementedError
