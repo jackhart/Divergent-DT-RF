@@ -165,6 +165,7 @@ class DecisionTreeClassification(GeneralDecisionTree):
         else:
             # stopping criterion: gini not improved
             # gini is greater than user-specified maximum gini
+            # gini is greater than user-specified maximum gini
             return
 
     def prune(self):

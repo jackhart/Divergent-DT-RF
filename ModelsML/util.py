@@ -15,14 +15,25 @@ def gini(class_counts, total_count):
 
 
 def find_splits(x):
-    # find the first list for all possible values of list split in two
-    # TODO: This doesn't work as intended yet
+    """
+    Find the first list for all possible values of list split into two.
+    Used to find 2^I - 1 possible splits for categorical variables.
+    :param x, array of unique feature values
+    :return: list of tuples, half of values for all possible splits
+    """
     values = []
-    for i in range(math.ceil(len(x) / 2) + 1):
-        for temp in combinations(x[i:], i + 1):
-            values.append(temp)
+    max_values = math.floor(x.shape[0] / 2)
+    remainder = x.shape[0] % 2
+    for size in range(1, max_values + 1):
+        for combs in combinations(x, size):
+            values.append(combs)
+
+    if remainder == 0:
+        middle_vals = [value for value in values if len(value) == max_values]
+        values = [value for value in values if value not in middle_vals[0:int(len(middle_vals)/2)]]
 
     return values
+
 
 def create_synthetic_data_function(type_p='xor'):
     """
