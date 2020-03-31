@@ -1,15 +1,16 @@
 """Implementations of Estimators for Random Forests"""
 
 from .abstract_estimator import Estimator
-from .DecisionTrees import DecisionTreeClassification, KeDTClassification
+from .DecisionTreeEstimators import ClassicDecisionTreeClassifier
 from .util import gini, time_function
 import numpy as np
 
 class ClassicRandomForestClassifier(Estimator):
     """
     Implements Random Forest with DecisionTreeClassification objects.
+
+    Random forest is implemented based on https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf
     """
-    # TODO: add documentation on Breiman papers for RF
 
     def __init__(self, data_types=None):
         """
@@ -19,19 +20,21 @@ class ClassicRandomForestClassifier(Estimator):
         # TODO: implement init
         super().__init__()
         self.data_types = data_types
-        self.trees = []
+        self.tree_classifiers = []
         self.n_classes = None
 
     @time_function
-    def train(self, x_train, y_train, data_types=None, min_size=2, max_depth=None, max_gini=1):
+    def train(self, x_train, y_train, hparams, data_types=None):
         """
         Default setup for training estimator
         :param x_train: np.array(shape=(n, p)),  training features
         :param y_train: np.array(shape=(n, 1)),   training classes/values
         :param data_types: list, optional,  ordered list of feature types (see base Estimator class for details)
-        :param min_size: int, minimum number of examples in node, default is 2
-        :param max_depth: int, optional, maximum depth of tree
-        :param max_gini: int, maximum gini for split allowed, default is 1
+        :param hparams: Hparams, object containing additional parameters.
+                        Must Contain:
+                            min_size: int, minimum number of examples in node, default is 2
+                            max_depth: int, optional, maximum depth of tree
+                            max_gini: int, maximum gini for split allowed, default is 1
 
         :return self
         """

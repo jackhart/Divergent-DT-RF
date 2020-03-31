@@ -5,7 +5,6 @@ from .params import Hparams, ParamsContainers
 def define_config():
   config = Hparams()
   config.seed = 58
-  config.model = 'ClassicDecisionTreeClassifier'
   config.split_type = 'holdout'
   config.dataset = 'xor'
   config.prop_test = 0.1
@@ -17,7 +16,6 @@ def define_config():
 def define_config():
   config = Hparams()
   config.seed = 58
-  config.model = 'ClassicDecisionTreeClassifier'
   config.dataset = 'donut'
   config.split_type = 'holdout'
   config.prop_test = 0.1
@@ -30,7 +28,6 @@ def define_config():
 def define_config():
   config = Hparams()
   config.seed = 58
-  config.model = 'ClassicDecisionTreeClassifier'
   config.dataset = 'votes'
   config.split_type = 'holdout'
   config.data_path = "UCI/data/house-votes-84.data"
@@ -38,4 +35,15 @@ def define_config():
 
   return config
 
+
+
+@ParamsContainers.model_params.register('ClassicDecisionTreeClassifier_default')
+def define_config():
+  config = Hparams()
+  config.model = 'ClassicDecisionTreeClassifier'
+  config.min_size = 2
+  config.max_depth = None
+  config.max_gini = 1.0
+
+  return config
 

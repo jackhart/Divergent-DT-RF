@@ -23,31 +23,34 @@ split_types = ['holdout']  # TODO: Add implementation beyond holdout
 def main(args):
     """run experiments"""
 
-    # extract hparams for experiment
-    hparams = ParamsContainers.experiment_params[args.experiment_hparams]
+    # extract hparams for experiment and model
+    experiment_hparams = ParamsContainers.experiment_params[args.experiment_hparams]
+    model_hparams = ParamsContainers.model_params[args.model_hparams]
 
     # update hparams
-    if args.hparams_update is not None:
-        hparams.update_attributes(args.hparams_update)
+    if args.experiment_hparams_update is not None:
+        experiment_hparams.update_attributes(args.experiment_hparams_update)
+    if args.model_hparams_update is not None:
+        model_hparams.update_attributes(args.model_hparams_update)
 
     # create dataset
-    dataset_x, dataset_y, data_types = datasets[hparams.dataset](hparams)
+    dataset_x, dataset_y, data_types = datasets[experiment_hparams.dataset](experiment_hparams)
 
     # instantiate estimator
-    basic_tree = classifiers[hparams.model]()
+    basic_tree = classifiers[model_hparams.model]()
 
     # Only Holdout implemented
     # TODO: Add functionality for cross validation in Hparams
     x_train, x_test, y_train, y_test = train_test_split(dataset_x, dataset_y,
-                                                        test_size=hparams.prop_test, random_state=hparams.seed)
+                                                        test_size=experiment_hparams.prop_test,
+                                                        random_state=experiment_hparams.seed)
 
     # train estimator
-    basic_tree_fitted, train_time = basic_tree.train(x_train, y_train, data_types=data_types)
+    basic_tree_fitted, train_time = basic_tree.train(x_train, y_train, model_hparams, data_types=data_types)
 
     # predict
     probabilities_train, predictions_train, train_pred_time = basic_tree_fitted.predict(x_train)
     probabilities_test, predictions_test, test_pred_time = basic_tree_fitted.predict(x_test)
-
 
     # print results
     print(f"Train Accuracy: {accuracy_score(y_train, predictions_train)}")
@@ -59,11 +62,15 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='experiment runner')
 
+    """See defined_params.py for Hparam objects"""
     parser.add_argument('--experiment_hparams', type=str, default='classic_xor',
                         help='ParamContainer for experiment hyper-parameters')
-    """See defined_params.py for Hparam objects"""
+    parser.add_argument('--model_hparams', type=str, default='ClassicDecisionTreeClassifier_default',
+                        help='ParamContainer for experiment hyper-parameters')
 
-    parser.add_argument('--hparams_update', type=str, default=None,
+    parser.add_argument('--experiment_hparams_update', type=str, default=None,
+                        help='Comma separated key-value pairs to update Hparams object')
+    parser.add_argument('--model_hparams_update', type=str, default=None,
                         help='Comma separated key-value pairs to update Hparams object')
 
     args = parser.parse_args()

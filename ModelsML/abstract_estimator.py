@@ -13,27 +13,32 @@ class Estimator(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def train(self, x_train, y_train, data_types=None, *args):
+    def train(self, x_train, y_train, hparams, data_types=None):
         """
         Default setup for training estimator
         :param x_train: np.array(shape=(n, p)), training features
         :param y_train: np.array(shape=(n, )),  training classes/values
+        :param hparams: Hparams object to hold any additional parameters
         :param data_types: list, optional,  ordered list of size p containing feature types
                             `n`: numeric
                             `o`: ordinal categorical
                             `c`: categorical, no order
                             If None, assumes all values are numeric.
+
+        :returns self
         """
-        return NotImplementedError
+        raise NotImplementedError
 
     @abstractmethod
-    def predict(self, x_test, y_test, *args):
+    def predict(self, x_test):
         """
         Default setup for predicting with trained estimator
         :param x_test: np.array(shape=(m, p)), testing features
-        :param y_test: np.array(shape=(m, )),  testing classes/values
+
+        :returns predictions and probabilities
         """
-        return NotImplementedError
+        raise NotImplementedError
 
     def __str__(self):
         return self.__repr__()
+

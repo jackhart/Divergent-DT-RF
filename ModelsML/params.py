@@ -29,7 +29,11 @@ class Hparams(dict):
 
         # update attributes in object
         for key, value in update_values.items():
-            current_type = type(self[key])
+            if self[key] is None:  # If None is default, assume float TODO: think of a better way to handle this
+                current_type = float
+            else:
+                current_type = type(self[key])
+
             self[key] = current_type(value)  # cast to type of previous param
 
 

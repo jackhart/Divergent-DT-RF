@@ -22,20 +22,21 @@ class ClassicDecisionTreeClassifier(Estimator):
         super().__init__()
         self.data_types = data_types
         self.tree = None
-        self.simplified_tree = None   # TODO: make tree struct with simpler storage to improve classification time?
         self.n_classes = None
 
     @time_function
-    def train(self, x_train, y_train, data_types=None, min_size=2, max_depth=None, max_gini=1):
+    def train(self, x_train, y_train, hparams, data_types=None):
         """
         Train classic decision tree.
 
         :param x_train: np.array(shape=(n, p)),  training features
         :param y_train: np.array(shape=(n, 1)),   training classes/values
         :param data_types: list, optional,  ordered list of feature types (see base Estimator class for details)
-        :param min_size: int, minimum number of examples in node, default is 2
-        :param max_depth: int, optional, maximum depth of tree
-        :param max_gini: int, maximum gini for split allowed, default is 1
+        :param hparams: Hparams, object containing additional parameters.
+                        Must Contain:
+                            min_size: int, minimum number of examples in node, default is 2
+                            max_depth: int, optional, maximum depth of tree
+                            max_gini: int, maximum gini for split allowed, default is 1
 
         :return self, ClassicDecisionTreeClassifier: a trained version of itself
         """
@@ -51,13 +52,12 @@ class ClassicDecisionTreeClassifier(Estimator):
 
         # create tree stump and calculate gini
         _, class_distribution = np.unique(y_train, return_counts=True)
-
         stump_gini = gini(np.array(class_distribution), y_train.size)
         self.tree = DecisionTreeClassification(class_counts=np.array(class_distribution), n_subset=y_train.size)
 
         # grow tree
         self.tree.grow_tree(x_train, y_train, data_types, stump_gini, self.n_classes,
-                            min_size=min_size, max_depth=max_depth, current_depth=0, max_gini=1)
+                            min_size=hparams.min_size, max_depth=hparams.max_depth, current_depth=0, max_gini=hparams.max_gini)
 
         # prune tree
         # TODO: self.tree.prune()
@@ -68,8 +68,8 @@ class ClassicDecisionTreeClassifier(Estimator):
     def predict(self, x_test):
         """
         Uses averaging in the leaf nodes for classification.
-
         :param x_test: np.array(shape=(m, p)), testing features
+
         :return tuple of lists: (probabilities, predictions)
         """
 
