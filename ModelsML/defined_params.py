@@ -56,13 +56,13 @@ def define_config():
 def define_config():
   config = Hparams()
   config.model = 'ClassicRandomForestClassifier'
-  config.min_size = 1
+  config.min_size = 2
   config.max_depth = None
   config.max_gini = 1.0
 
   config.seed = 58
   config.m_try = 1
-  config.n_trees = 30
+  config.n_trees = 100
   config.bootstrap = 100
 
   return config

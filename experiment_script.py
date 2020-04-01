@@ -17,6 +17,7 @@ datasets = {'xor': create_synthetic_data_function(type_p='xor'),
             'donut': create_synthetic_data_function(type_p='donut'),
             'iris': create_synthetic_data_function(type_p='iris'),
             'wine': create_synthetic_data_function(type_p='wine'),
+            'breast_cancer': create_synthetic_data_function(type_p='breast_cancer'),
             'votes': load_UCI_function(type_p='votes')}
 
 split_types = ['holdout']  # TODO: Add implementation beyond holdout

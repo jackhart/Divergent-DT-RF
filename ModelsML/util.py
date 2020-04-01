@@ -5,7 +5,7 @@ import pandas as pd
 import math
 import timeit
 from itertools import combinations
-from sklearn.datasets import make_gaussian_quantiles, load_iris, load_wine
+from sklearn.datasets import make_gaussian_quantiles, load_iris, load_wine, load_breast_cancer
 
 
 def gini(class_counts, total_count):
@@ -66,6 +66,10 @@ def create_synthetic_data_function(type_p='xor'):
         if type_p == 'wine':
             x, y = load_wine(return_X_y=True)
             return x, y.reshape(-1, 1), ['n'] * 13
+
+        if type_p == "breast_cancer":
+            x, y = load_breast_cancer(return_X_y=True)
+            return x, y.reshape(-1, 1), ['n'] * 30
 
         raise NotImplementedError
 
