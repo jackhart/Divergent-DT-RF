@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from ModelsML.DecisionTreeEstimators import ClassicDecisionTreeClassifier
+from ModelsML.RandomForestEstimators import ClassicRandomForestClassifier
 from ModelsML.util import create_synthetic_data_function, load_UCI_function, time_function
 from ModelsML.defined_params import *
 
@@ -9,7 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
-classifiers = {'ClassicDecisionTreeClassifier': ClassicDecisionTreeClassifier}
+classifiers = {'ClassicDecisionTreeClassifier': ClassicDecisionTreeClassifier,
+               'ClassicRandomForestClassifier': ClassicRandomForestClassifier}
 
 datasets = {'xor': create_synthetic_data_function(type_p='xor'),
             'donut': create_synthetic_data_function(type_p='donut'),

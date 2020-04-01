@@ -1,5 +1,7 @@
 from .params import Hparams, ParamsContainers
 
+"""Experiment hyper-parameters"""
+
 
 @ParamsContainers.experiment_params.register('classic_xor')
 def define_config():
@@ -36,6 +38,8 @@ def define_config():
   return config
 
 
+"""Model hyper-parameters"""
+
 
 @ParamsContainers.model_params.register('ClassicDecisionTreeClassifier_default')
 def define_config():
@@ -44,6 +48,22 @@ def define_config():
   config.min_size = 2
   config.max_depth = None
   config.max_gini = 1.0
+
+  return config
+
+
+@ParamsContainers.model_params.register('ClassicRandomForestClassifier_default')
+def define_config():
+  config = Hparams()
+  config.model = 'ClassicRandomForestClassifier'
+  config.min_size = 1
+  config.max_depth = None
+  config.max_gini = 1.0
+
+  config.seed = 58
+  config.m_try = 1
+  config.n_trees = 30
+  config.bootstrap = 100
 
   return config
 

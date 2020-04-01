@@ -148,14 +148,16 @@ class DecisionTreeClassification(GeneralDecisionTree):
 
             # grow left child
             left_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child1",
-                                                   class_counts=np.array(left_distribution), n_subset=left_y.size)
+                                                   class_counts=np.array(left_distribution),
+                                                   n_subset=np.sum(left_distribution))
 
             left_tree.grow_tree(left_x, left_y, data_types, gini(np.array(left_distribution), left_y.size),
                                 classes=classes, min_size=min_size, max_depth=max_depth, current_depth=current_depth + 1)
 
             # grow right child
             right_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child2",
-                                                    class_counts=np.array(right_distribution), n_subset=right_y.size)
+                                                    class_counts=np.array(right_distribution),
+                                                    n_subset=np.sum(right_distribution))
 
             right_tree.grow_tree(right_x, right_y, data_types, gini(np.array(right_distribution), right_y.size),
                                  classes=classes, min_size=min_size, max_depth=max_depth, current_depth=current_depth + 1)

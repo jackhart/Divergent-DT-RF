@@ -49,6 +49,8 @@ class ClassicDecisionTreeClassifier(Estimator):
         # set data_types to numeric if not provided
         if data_types is None:
             self.data_types = ['n'] * p
+        else:
+            self.data_types = data_types
 
         # create tree stump and calculate gini
         _, class_distribution = np.unique(y_train, return_counts=True)
@@ -56,7 +58,7 @@ class ClassicDecisionTreeClassifier(Estimator):
         self.tree = DecisionTreeClassification(class_counts=np.array(class_distribution), n_subset=y_train.size)
 
         # grow tree
-        self.tree.grow_tree(x_train, y_train, data_types, stump_gini, self.n_classes,
+        self.tree.grow_tree(x_train, y_train, self.data_types, stump_gini, self.n_classes,
                             min_size=hparams.min_size, max_depth=hparams.max_depth, current_depth=0, max_gini=hparams.max_gini)
 
         # prune tree
@@ -79,7 +81,6 @@ class ClassicDecisionTreeClassifier(Estimator):
         predictions = []
         for x in x_test:
             final_node = self.tree.traverse(x)
-
             probabilities.append(final_node.class_counts / final_node.n_subset)
             predictions.append(self.n_classes[np.argmax(probabilities[-1])])
 
