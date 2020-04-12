@@ -3,7 +3,10 @@
 from .abstract_estimator import Estimator
 from .DecisionTreeEstimators import ClassicDecisionTreeClassifier
 from .util import time_function
+
 import numpy as np
+from multiprocessing import Process, Pool, cpu_count
+
 
 class ClassicRandomForestClassifier(Estimator):
     """
@@ -17,7 +20,6 @@ class ClassicRandomForestClassifier(Estimator):
         Default implementation
         :param data_types: list, optional, ordered list of feature types (see base Estimator class for details)
         """
-        # TODO: implement init
         super().__init__()
         self.data_types = data_types
         self.classes = None
@@ -62,18 +64,25 @@ class ClassicRandomForestClassifier(Estimator):
 
         # subset features
         features_inx = np.array([*range(p)])
-        self.sample_features = [np.random.choice(features_inx, replace=False,
-                                                 size=hparams.m_try) for _ in range(hparams.n_trees)]
+        features = [np.random.choice(features_inx, replace=False,
+                                     size=hparams.m_try) for _ in range(hparams.n_trees)]
+        self.sample_features = [np.isin(features_inx, features_tree) for features_tree in features]
 
         # train each tree
+        #pool = Pool(cpu_count())
+        #jobs = [apply_async(pool, self._train_parallel, args=(cls, feat, x_train, y_train, hparams))
+        #     for cls, feat in zip(self.tree_classifiers, self.sample_features)]
+        #self.tree_classifiers = [job.get() for job in jobs]
+        #pool.close()
+
         for tree, features in zip(self.tree_classifiers, self.sample_features):
             if hparams.bootstrap is True:
                 x_subset = np.random.choice(x_train[:, features], size=n, replace=True)
             else:
                 x_subset = x_train[:, features]
 
-            # if hparams.m_try == 1:  # edge case where we are selecting 1 variable
-            #   x_subset = x_subset.reshape((-1, 1))
+            if hparams.m_try == 1:  # edge case where we are selecting 1 variable
+                x_subset = x_subset.reshape((-1, 1))
 
             _, _ = tree.train(x_subset, y_train, hparams)
 
@@ -108,61 +117,20 @@ class ClassicRandomForestClassifier(Estimator):
             ind = np.argmax(counts)
             return values[ind]
 
-    def __repr__(self):
-        return 'ClassicRandomForestClassifier()'
+    @staticmethod
+    def _train_parallel(cls, feat, x, y, hparams):
+        cls.train(x[:, feat], y, hparams)
+        return cls
 
-
-
-class KeRF(Estimator):
-    """
-    Implements KeRF with KeDTClassification objects.
-    """
-    # TODO: add documentation on KeRF
-
-    def __init__(self, data_types=None):
-        """
-        Default implementation
-        :param data_types: list, optional, ordered list of feature types (see base Estimator class for details)
-        """
-        # TODO: implement init
-        super().__init__()
-        self.data_types = data_types
-        self.trees = []
-        self.n_classes = None
-
-    @time_function
-    def train(self, x_train, y_train, data_types=None, min_size=2, max_depth=None, max_gini=1):
-        """
-        Default setup for training estimator
-        :param x_train: np.array(shape=(n, p)),  training features
-        :param y_train: np.array(shape=(n, 1)),   training classes/values
-        :param data_types: list, optional,  ordered list of feature types (see base Estimator class for details)
-        :param min_size: int, minimum number of examples in node, default is 2
-        :param max_depth: int, optional, maximum depth of tree
-        :param max_gini: int, maximum gini for split allowed, default is 1
-
-        :return self
-        """
-
-        # TODO: implement training
-        raise NotImplementedError
-
-    @time_function
-    def predict(self, x_test):
-        """
-        Uses averaging in the leaf nodes for classification.
-
-        Default setup for predicting with trained estimator
-        :param x_test: np.array(shape=(m, p)), testing features
-
-        :return tuple of lists: (probabilities, predictions)
-        """
-
-        # TODO: implement predicting
-        raise NotImplementedError
+    def _runInParallel(self, x, y, hparams):
+        proc = []
+        for cls, feat in zip(self.tree_classifiers, self.sample_features):
+            p = Process(target=cls.train, args=(x[:, feat], y, hparams))
+            p.start()
+            proc.append(p)
+        for p in proc:
+            p.join()
 
     def __repr__(self):
         return 'ClassicRandomForestClassifier()'
-
-
 

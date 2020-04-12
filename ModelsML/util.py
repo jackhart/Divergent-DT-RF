@@ -5,13 +5,25 @@ import pandas as pd
 import math
 import timeit
 from itertools import combinations
-from sklearn.datasets import make_gaussian_quantiles, load_iris, load_wine, load_breast_cancer
+from sklearn.datasets import make_gaussian_quantiles, make_moons, load_iris, load_wine, load_breast_cancer
 
 
 def gini(class_counts, total_count):
     if total_count == 0:
         return 1
     return 1 - np.sum((class_counts / total_count) ** 2)
+
+
+def entropy(class_counts, total_count):
+    if total_count == 0:
+        return 1
+
+    probabilities = class_counts / total_count
+    with np.errstate(divide='ignore'):
+        logged_probs = np.log2(probabilities)
+        logged_probs[np.isneginf(logged_probs)] = 0
+
+    return -1.0 * np.sum(probabilities * logged_probs)
 
 
 def find_splits(x):
@@ -57,6 +69,10 @@ def create_synthetic_data_function(type_p='xor'):
             x, y = make_gaussian_quantiles(cov=3.,
                                              n_samples=hparams.n, n_features=2,
                                              n_classes=2, random_state=hparams.seed)
+            return np.array(x), np.array(y).reshape(-1, 1), ['n', 'n']
+
+        if type_p == 'moons':
+            x, y = make_moons(n_samples=500, noise=0.1, random_state=hparams.seed)
             return np.array(x), np.array(y).reshape(-1, 1), ['n', 'n']
 
         if type_p == 'iris':

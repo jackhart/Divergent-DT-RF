@@ -48,6 +48,7 @@ def define_config():
   config.min_size = 2
   config.max_depth = None
   config.max_gini = 1.0
+  config.metric = "entropy"
 
   return config
 
@@ -59,11 +60,23 @@ def define_config():
   config.min_size = 2
   config.max_depth = None
   config.max_gini = 1.0
+  config.metric = "gini"
 
   config.seed = 58
   config.m_try = 1
   config.n_trees = 100
   config.bootstrap = 100
+
+  return config
+
+@ParamsContainers.model_params.register('KeDTClassifier_default')
+def define_config():
+  config = Hparams()
+  config.model = 'KeDTClassifier'
+  config.min_size = 2
+  config.max_depth = None
+  config.max_gini = 1.0
+  config.metric = "entropy"
 
   return config
 

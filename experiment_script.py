@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-from ModelsML.DecisionTreeEstimators import ClassicDecisionTreeClassifier
+from ModelsML.DecisionTreeEstimators import ClassicDecisionTreeClassifier, KeDTClassifier
 from ModelsML.RandomForestEstimators import ClassicRandomForestClassifier
 from ModelsML.util import create_synthetic_data_function, load_UCI_function, time_function
 from ModelsML.defined_params import *
 
 import argparse
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 
-
 classifiers = {'ClassicDecisionTreeClassifier': ClassicDecisionTreeClassifier,
+               'KeDTClassifier': KeDTClassifier,
                'ClassicRandomForestClassifier': ClassicRandomForestClassifier}
 
 datasets = {'xor': create_synthetic_data_function(type_p='xor'),
@@ -18,6 +19,7 @@ datasets = {'xor': create_synthetic_data_function(type_p='xor'),
             'iris': create_synthetic_data_function(type_p='iris'),
             'wine': create_synthetic_data_function(type_p='wine'),
             'breast_cancer': create_synthetic_data_function(type_p='breast_cancer'),
+            'moons': create_synthetic_data_function(type_p='moons'),
             'votes': load_UCI_function(type_p='votes')}
 
 split_types = ['holdout']  # TODO: Add implementation beyond holdout

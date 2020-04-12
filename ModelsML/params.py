@@ -13,6 +13,12 @@ class Hparams(dict):
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
 
+    def __getstate__(self):
+        return self
+
+    def __setstate__(self, d):
+        self.__dict__.update(d)
+
     def update_attributes(self, comma_str):
         """
         Update function for values within object, given a command line string
