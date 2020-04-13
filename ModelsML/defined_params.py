@@ -25,6 +25,17 @@ def define_config():
 
   return config
 
+@ParamsContainers.experiment_params.register('classic_donut_cv')
+def define_config():
+  config = Hparams()
+  config.seed = 58
+  config.dataset = 'donut'
+  config.split_type = 'cv'
+  config.folds = 10
+  config.n = 500
+
+  return config
+
 
 @ParamsContainers.experiment_params.register('classic_votes')
 def define_config():

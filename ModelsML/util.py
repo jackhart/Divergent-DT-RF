@@ -72,7 +72,7 @@ def create_synthetic_data_function(type_p='xor'):
             return np.array(x), np.array(y).reshape(-1, 1), ['n', 'n']
 
         if type_p == 'moons':
-            x, y = make_moons(n_samples=500, noise=0.1, random_state=hparams.seed)
+            x, y = make_moons(n_samples=20000, noise=0.35, random_state=hparams.seed)
             return np.array(x), np.array(y).reshape(-1, 1), ['n', 'n']
 
         if type_p == 'iris':
