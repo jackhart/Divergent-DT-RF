@@ -7,7 +7,6 @@ import numpy as np
 class GeneralDecisionTree(object):
     """
     General Decision Tree implemented to support a CART algorithm
-
     Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression Tree
     ftp://ftp.boulder.ibm.com/software/analytics/spss/support/Stats/Docs/Statistics/Algorithms/14.0/TREE-CART.pdf
     """
@@ -61,7 +60,6 @@ class GeneralDecisionTree(object):
 class DecisionTreeClassification(GeneralDecisionTree):
     """
     Decision Tree implemented to support CART algorithm for Classification by saving only class counts
-
     Breiman, L., Friedman, J.H., Olshen, R., and Stone, C.J., 1984. Classification and Regression Tree
     ftp://ftp.boulder.ibm.com/software/analytics/spss/support/Stats/Docs/Statistics/Algorithms/14.0/TREE-CART.pdf
     """
@@ -71,10 +69,8 @@ class DecisionTreeClassification(GeneralDecisionTree):
                  children=None, split_rule=None, split_feature=None):
         """
         Initialize decision tree with functionality specific for traditional classification.
-
         :param class_counts, np.array, counts of examples for each class in node
         :param n_subset, int, number of examples represented by this node
-
         :param name, str, (default='root'), see parent class
         :param children, list, (default=None), see parent class
         :param split_rule, lambda function, (default=None), function that returns index of child for split
@@ -91,20 +87,17 @@ class DecisionTreeClassification(GeneralDecisionTree):
                   min_size=2, max_depth=None, current_depth=0, max_gini=1):
         """
         Grows tree for given dataset for a classification task.  Recursive.
-
         :param X, np.array, subset of variables to split on
         :param y, np.array, subset of classes
         :param data_types, list, data types (i.e. numeric, ordinal, or categorical) of X
         :param best_gini, double, gini of the current node being split
         :param classes, np.array, array of all possible class values
-
         :param metric_func, function,  (default = "gini"), type of splitting used, either "gini" or "entropy"
         :param min_size, int, (default=2) minimum allowable number of examples making up a node
         :param max_depth, int, (default=None) maximum number of branches off nodes allowed
         :param current_depth, used in recursion to keep track of tree depth
         :param max_gini, int, (default=1) maximum gini you allow for a split to happen
         """
-
         if (y.size < min_size) or (best_gini == 0.0):
             # stopping criterion: node be smaller than min size
             # if node is pure, don't split
@@ -186,12 +179,10 @@ class DecisionTreeClassification(GeneralDecisionTree):
         """
          Determines the best split possible for a given feature.
          Helper method for grow_tree()
-
          :param feature_values, np.array, subset of variables for given feature to split on
          :param labels, np.array, subset of classes
          :param data_type, str, data type (i.e. numeric, ordinal, or categorical) for given feature
          :param classes, np.array, array of all possible class values
-
          :returns tuple, (best_thr, impurity, best_left_dist, best_right_dist)
                   Returns best value to split on and associated impurity,
                   along with the class distributions in each node.
@@ -253,7 +244,6 @@ class KeDTClassification(GeneralDecisionTree):
     """
      Decision Tree implemented to support method that utilizes a symetric KL-Divergence to avoid
      iterating over data.
-
      The only important differences from the previous class is in _best_split_classification
     """
 
@@ -261,10 +251,8 @@ class KeDTClassification(GeneralDecisionTree):
                  children=None, split_rule=None, split_feature=None):
         """
         Initialize decision tree with functionality specific for traditional classification.
-
         :param class_counts, np.array, counts of examples for each class in node
         :param n_subset, int, number of examples represented by this node
-
         :param name, str, (default='root'), see parent class
         :param children, list, (default=None), see parent class
         :param split_rule, lambda function, (default=None), function that returns index of child for split
@@ -281,13 +269,11 @@ class KeDTClassification(GeneralDecisionTree):
                   min_size=2, max_depth=None, current_depth=0, max_gini=1):
         """
         Grows tree for given dataset for a classification task.  Recursive.
-
         :param X, np.array, subset of variables to split on
         :param y, np.array, subset of classes
         :param data_types, list, data types (i.e. numeric, ordinal, or categorical) of X
         :param best_gini, double, gini of the current node being split
         :param classes, np.array, array of all possible class values
-
         :param metric_func, function,  (default = "gini"), type of splitting used, either "gini" or "entropy"
         :param min_size, int, (default=2) minimum allowable number of examples making up a node
         :param max_depth, int, (default=None) maximum number of branches off nodes allowed
@@ -297,7 +283,9 @@ class KeDTClassification(GeneralDecisionTree):
         assert all(data_t == 'n' for data_t in data_types), "KeDTClassification currently only works for numeric data"
         assert classes.size == 2, "KeDTClassification currently only works for binary classification"
 
-        if (y.size < min_size) or (best_gini == 0.0):
+        _, class_pop = np.unique(y, return_counts=True)
+
+        if (y.size < min_size) or (best_gini == 0.0) or class_pop[0]<2 or class_pop[1]<2:
             # stopping criterion: node be smaller than min size
             # if node is pure, don't split
             return
@@ -342,7 +330,8 @@ class KeDTClassification(GeneralDecisionTree):
                 return
 
             # grow left child
-            left_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child1",
+
+            left_tree = KeDTClassification(name=f"{self.name}_{best_p_ind}_child1",
                                                    class_counts=np.array(best_left_dist),
                                                    n_subset=np.sum(best_left_dist))
 
@@ -351,7 +340,8 @@ class KeDTClassification(GeneralDecisionTree):
                                 current_depth=current_depth + 1, metric_func=metric_func)
 
             # grow right child
-            right_tree = DecisionTreeClassification(name=f"{self.name}_{best_p_ind}_child2",
+
+            right_tree = KeDTClassification(name=f"{self.name}_{best_p_ind}_child2",
                                                     class_counts=np.array(best_right_dist),
                                                     n_subset=np.sum(best_right_dist))
 
@@ -404,11 +394,14 @@ class KeDTClassification(GeneralDecisionTree):
 
         D_lall = lambda_div * D_l1 + (1 - lambda_div) * D_l0
 
-        trimmed_D = D_lall[5:(D_lall.size - 5)]
-        trimmed_x_vals = x_vals[5:(x_vals.size - 5)]
-        ind_min = np.argpartition(trimmed_D, 4)[0:4]
+        top_n = 5
+
+        trimmed_D = D_lall[top_n:(D_lall.size - top_n)]
+        trimmed_x_vals = x_vals[top_n:(x_vals.size - top_n)]
+        ind_min = np.argpartition(trimmed_D, top_n-1)[0:top_n-1]
 
         top_5_partitions = trimmed_x_vals[ind_min]
+
         for threshold in top_5_partitions:
 
             selection = feature_values > threshold
