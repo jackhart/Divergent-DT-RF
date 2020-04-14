@@ -33,16 +33,22 @@ Working with data from [UCI Machine Learning Repo](https://archive.ics.uci.edu/m
 
 ## Command Line Examples
 
-Example usage of `experiment_script.py`
+Example usage of `experiment_script.py`.
 
-This is the default:
+The Hparam object is used to abstract away *experiment parameters* and *model parameters*.  Their defaults are defined in `ModelsML/defined_params.py`. 
+
+Here's an example usage of specific Hparam objects:
 
 ``` bash
-$ python experiment_script.py --experiment_hparams classic_xor
+$ 
+python experiment_script.py --experiment_hparams classic_donut_cv \\
+--model_hparams KeDTClassifier_default 
 ```
 
-Here's an example of using a specific Hparam object:
-
-``` bash
-$ python experiment_script.py --experiment_hparams classic_donut
+You can adjust specific details of an Hparams object in this script by indicating the changes in a comma-separated list.  This example adjusts the above code to instead use the breast cancer data.
+ 
+ ``` bash
+$ python experiment_script.py --experiment_hparams classic_donut_cv \\
+--model_hparams KeDTClassifier_default \\
+--experiment_hparams_update dataset=breast_cancer
 ```
