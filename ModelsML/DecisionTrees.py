@@ -38,17 +38,16 @@ class GeneralDecisionTree(object):
             self._children.remove(child)
 
     def traverse(self, x):
-        """Method for traversing tree given some example from data.  Recursive."""
+        """Method for traversing tree given some example from data to a leaf node"""
+        node = self
+        while node.children:
+            try:
+                child_index = node.split_rule(x[node.split_feature])
+            except TypeError:
+                return node  # edge case if test data contains NA
+            node = node.children[np.asscalar(child_index)]
 
-        if self.children is None:
-            return self
-        try:
-            child_index = self.split_rule(x[self.split_feature])
-        except TypeError:
-            return self  # edge case if test data contains NA
-
-        child_index = np.asscalar(np.array(child_index))
-        return self.children[child_index].traverse(x)
+        return node
 
     def __repr__(self):
         return f"Tree(name='{self.name}', children={[child for child in self.children]})"
@@ -189,6 +188,11 @@ class DecisionTreeClassification(GeneralDecisionTree):
          """
 
         best_thr, impurity, best_left_dist, best_right_dist = None, 1, None, None   # current min impurity
+
+        #sort data
+        indx = np.argsort(feature_values, axis=0).reshape(-1)
+        feature_values, labels = feature_values[indx], labels[indx]
+
         possible_thresholds = np.unique(feature_values)
 
         num_labels = labels.size

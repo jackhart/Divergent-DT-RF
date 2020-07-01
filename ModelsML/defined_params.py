@@ -63,6 +63,17 @@ def define_config():
 
   return config
 
+@ParamsContainers.model_params.register('KeDTClassifier_default')
+def define_config():
+  config = Hparams()
+  config.model = 'KeDTClassifier'
+  config.min_size = 2
+  config.max_depth = None
+  config.max_gini = 1.0
+  config.metric = "entropy"
+
+  return config
+
 
 @ParamsContainers.model_params.register('ClassicRandomForestClassifier_default')
 def define_config():
@@ -80,14 +91,4 @@ def define_config():
 
   return config
 
-@ParamsContainers.model_params.register('KeDTClassifier_default')
-def define_config():
-  config = Hparams()
-  config.model = 'KeDTClassifier'
-  config.min_size = 2
-  config.max_depth = None
-  config.max_gini = 1.0
-  config.metric = "entropy"
-
-  return config
 

@@ -93,12 +93,15 @@ class ClassicDecisionTreeClassifier(Estimator):
 
         probabilities = []
         predictions = []
-        for x in x_test:
-            final_node = self.tree.traverse(x)
-            probabilities.append(final_node.class_counts / final_node.n_subset)
+        for pred_leaf in self._leaf_node(x_test):
+            probabilities.append(pred_leaf.class_counts / pred_leaf.n_subset)
             predictions.append(self.n_classes[np.argmax(probabilities[-1])])
 
-        return (probabilities, predictions)
+        return probabilities, predictions
+
+    def _leaf_node(self, X):
+        for x in X:
+            yield self.tree.traverse(x)
 
     def __repr__(self):
         return 'ClassicDecisionTreeClassifier()'
